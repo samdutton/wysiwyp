@@ -1,0 +1,35 @@
+{
+	"name" : "wysiwyp",
+	"version" : "1.0",
+	"description" : "Save framegrabs from any HTML video element",
+	"background_page" : "background.html",
+	"browser_action" : {
+		"default_icon" : "images/wysiwyp-22.png",
+		"popup" : "popup.html",
+		"default_title" : "Click to view saved framegrabs"
+	},
+	"content_scripts" : [
+		{
+			"matches" : [
+				"http://*/*",
+				"https://*/*"
+			],
+	
+		"css" : ["css/injected.css"],
+		"js" : ["js/jquery-1.4.2.js", "js/jquery.url.js", "js/contentscript.js"],
+			"run_at" : "document_idle",
+			"all_frames" : false
+		}
+	],
+	"icons" : {
+		"16" : "images/wysiwyp-16.png",
+		"22" : "images/wysiwyp-22.png",
+		"32" : "images/wysiwyp-32.png",
+		"48" : "images/wysiwyp-48.png",
+		"128" : "images/wysiwyp-128.png"
+	},
+	"permissions": [
+        "unlimitedStorage",
+        "tabs"
+	]
+  }
