@@ -1,12 +1,12 @@
 {
 	"name" : "wysiwyp",
 	"version" : "1.0",
-	"description" : "Save framegrabs from any HTML video element",
+	"description" : "What You See-Is-What-You-Get printing for Google Maps",
 	"background_page" : "background.html",
 	"browser_action" : {
-		"default_icon" : "images/wysiwyp-22.png",
+		"default_icon" : "images/wysiwyp22.png",
 		"popup" : "popup.html",
-		"default_title" : "Click to view saved framegrabs"
+		"default_title" : "Click for an A4 print of this map"
 	},
 	"content_scripts" : [
 		{
@@ -16,17 +16,18 @@
 			],
 	
 		"css" : ["css/injected.css"],
-		"js" : ["js/jquery-1.6.1.js", "js/jquery.url.js", "js/contentscript.js"],
-			"run_at" : "document_idle",
-			"all_frames" : false
+		"js" : ["js/jquery-1.6.1.js", "js/jquery.url.js", "js/contentscript.js",
+				"http://maps.gstatic.com/intl/en_us/mapfiles/api-3/5/5/main.js"],
+		"run_at" : "document_start",
+		"all_frames" : false
 		}
 	],
 	"icons" : {
-		"16" : "images/wysiwyp-16.png",
-		"22" : "images/wysiwyp-22.png",
-		"32" : "images/wysiwyp-32.png",
-		"48" : "images/wysiwyp-48.png",
-		"128" : "images/wysiwyp-128.png"
+		"16" : "images/wysiwyp16.png",
+		"22" : "images/wysiwyp22.png",
+		"32" : "images/wysiwyp32.png",
+		"48" : "images/wysiwyp48.png",
+		"128" : "images/wysiwyp128.png"
 	},
 	"permissions": [
         "unlimitedStorage",

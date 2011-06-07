@@ -1,6 +1,3 @@
-var framegrabToDisplay = {};
-
-
 function transactionErrorHandler(error) {
     alert("Transaction error: " + error.message + ", code: " + error.code);
 }
@@ -72,87 +69,55 @@ function getData(statement, callback) {
 	});
 }
 
-function storeFramegrab(request) {
-	// don't know why this doesn't work
-	//	var statement = "BEGIN IF NOT EXISTS (SELECT * FROM framegrabs WHERE pageUrl = '" + request.pageUrl + "' AND videoSrc = '" + request.videoSrc + 
-	//	"' AND timecode = '" + request.timecode + "') THEN INSERT INTO framegrabs (dataUrl, pageTitle, pageUrl, timecode, videoSrc) VALUES (?, ?, ?, ?, ?) END";
+// function storeFramegrab(request) {
+	// var statement = "INSERT INTO framegrabs (dataUrl, pageTitle, pageUrl, timecode, videoSrc) VALUES (?, ?, ?, ?, ?)";
+	// doQuery(statement, null, [request.dataUrl, request.pageTitle, request.pageUrl, request.timecode, request.videoSrc]);
+// }
 
-	var statement = "INSERT INTO framegrabs (dataUrl, pageTitle, pageUrl, timecode, videoSrc) VALUES (?, ?, ?, ?, ?)";
-	doQuery(statement, null, [request.dataUrl, request.pageTitle, request.pageUrl, request.timecode, request.videoSrc]);
-}
-
-function deleteFramegrabs(pageUrl, videoSrc) {
-    doQuery("DELETE FROM framegrabs WHERE pageUrl = '" + pageUrl + "' AND videoSrc = '" + videoSrc + "'");
-}
+// function deleteFramegrabs(pageUrl, videoSrc) {
+    // doQuery("DELETE FROM framegrabs WHERE pageUrl = '" + pageUrl + "' AND videoSrc = '" + videoSrc + "'");
+// }
 
 
 chrome.browserAction.setBadgeBackgroundColor({"color": [0, 200, 0, 100]});
 
-function initBrowserAction(request) {
-	if (request.numVideos > 0) {
-		var numVideos = request.numVideos.toString();
-		chrome.browserAction.setBadgeText({"text": numVideos});
-		chrome.browserAction.setTitle({"title": numVideos + " video element(s) found on this page. \nClick to view stored framegrabs, or save framegrabs \nby using the icons overlaid on the video(s)."});
-	}
-}
+// function initBrowserAction(request) {
+	// if (request.numVideos > 0) {
+		// var numVideos = request.numVideos.toString();
+		// chrome.browserAction.setBadgeText({"text": numVideos});
+		// chrome.browserAction.setTitle({"title": numVideos + " video element(s) found on this page. \nClick to view stored framegrabs, or save framegrabs \nby using the icons overlaid on the video(s)."});
+	// }
+// }
 
-// used from chrome://newtab/, i.e. when sending a request directly to the content script won't work
-function displayFramegrabFromNewTab(tabId, request) {
-    framegrabToDisplay = request;
-    chrome.tabs.update(tabId, {"url": request.pageUrl}, function(tab){});
-}	
-
-chrome.extension.onRequest.addListener(
-	function(request, sender, sendResponse) {
-        if (request.type === "displayFramegrabFromPopup") {
-			framegrabToDisplay = request;
-			chrome.tabs.getSelected(null, function(tab) {
-				chrome.tabs.update(tab.id, {"url": request.pageUrl}, function(tab){});
-			});	
-		// called from contentscript ready function
-		} else if (request.type === "sendFramegrabToDisplay") {
-			if (framegrabToDisplay.videoSrc) { // if a framegrabToDisplay has been set
-				request = framegrabToDisplay;
-				request.type = "displayFramegrabFromBackground";
-				chrome.tabs.sendRequest(sender.tab.id, request, function(response) {
-					framegrabToDisplay = {};
-				});
-			}
-		} else if (request.type === "initBrowserAction") {
-			initBrowserAction(request);
-		}  else if (request.type === "openCanvasInNewTab") {
-            chrome.tabs.create({"url": request.dataUrl, selected:false}, function(tab){
-                var newWindow = window.open();
-                chrome.tabs.sendRequest(tab.id, {"newWindow": newWindow}, function(response){});
-            });  
-		}  else if (request.type === "openFramegrabInNewTab") {
-            chrome.tabs.create({"url": request.dataUrl, selected:false}, function(){});  
-        } else if (request.type === "storeFramegrab") {
-			storeFramegrab(request);
-		} else {
-			alert("Unknown request type in background.html: " + request.type);
-		}
-		sendResponse({}); // otherwise request stays open -- this allows request to be cleaned up
-	}
-);
+// chrome.extension.onRequest.addListener(
+	// function(request, sender, sendResponse) {
+        // if (request.type === "displayFramegrabFromPopup") {
+			// });	
+		// } else if (request.type === "openCanvasInNewTab") {
+		// } else {
+			// alert("Unknown request type in background.html: " + request.type);
+		// }
+		// sendResponse({}); // otherwise request stays open -- this allows request to be cleaned up
+	// }
+// );
 
 
 // tab selection changed
-chrome.tabs.onSelectionChanged.addListener(
-	function handleSelectionChange(tabId, selectInfo) {
-		chrome.browserAction.setBadgeText({"text": ""});
-		chrome.browserAction.setTitle({"title": "No video elements found on this page. \nClick to view framegrabs saved from other pages."});
-		chrome.tabs.sendRequest(tabId, {"type": "sendNumVideos"}, initBrowserAction);
-	}
-);
+// chrome.tabs.onSelectionChanged.addListener(
+	// function handleSelectionChange(tabId, selectInfo) {
+		// chrome.browserAction.setBadgeText({"text": ""});
+		// chrome.browserAction.setTitle({"title": "No video elements found on this page. \nClick to view framegrabs saved from other pages."});
+		// chrome.tabs.sendRequest(tabId, {"type": "sendNumVideos"}, initBrowserAction);
+	// }
+// );
 
 
 // e.g. tab url changed
-chrome.tabs.onUpdated.addListener(
-	function handleUpdate(tabId, selectInfo) {
-		chrome.browserAction.setBadgeText({"text": ""});
-		chrome.browserAction.setTitle({"title": "No video elements found on this page. \nClick to view framegrabs saved from other pages."});
-		chrome.tabs.sendRequest(tabId, {"type": "sendNumVideos"}, initBrowserAction);
-	}
-);
+// chrome.tabs.onUpdated.addListener(
+	// function handleUpdate(tabId, selectInfo) {
+		// chrome.browserAction.setBadgeText({"text": ""});
+		// chrome.browserAction.setTitle({"title": "No video elements found on this page. \nClick to view framegrabs saved from other pages."});
+		// chrome.tabs.sendRequest(tabId, {"type": "sendNumVideos"}, initBrowserAction);
+	// }
+// );
 
